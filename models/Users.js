@@ -22,10 +22,15 @@ const UserSchema = new Schema(
     thoughts: [
       {
         type: Schema.Types.ObjectId,
-        ref: "toughts",
+        ref: "Thought",
       },
     ],
-    friends: [{}],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Users",
+      },
+    ],
   },
   {
     toJSON: {
@@ -33,6 +38,23 @@ const UserSchema = new Schema(
       getters: true,
     },
     id: false,
-    // We set id to false because this is a virtual that Mongoose returns, and we don’t need it.
+    // set id to false because this is a virtual that Mongoose returns, and we don’t need it.
   }
 );
+
+// get total count of thoughts
+UserSchema.virtual("thoughtCount").get(function () {
+  return this.thoughts.reduce(
+    (total, thoughts) => total + thoughts.length + 1,
+    0
+  );
+});
+
+// get total count of friends
+UserSchema.virtual("friendCount").get(function () {
+  return this.friends.reduce((total, friends) => total + friends.length + 1, 0);
+});
+
+const Users = model("Users", UserSchema);
+
+module.exports = Users;
