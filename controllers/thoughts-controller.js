@@ -1,40 +1,83 @@
 const { Thought, Users } = require("../models");
 
 const thoughtController = {
-  // add thought
-  addThought({ params, body }, res) {
-    console.log(body);
-    Thought.create(body)
-      .then(({ _id }) => {
-        return Users.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { thoughts: _id } },
-          { new: true }
-        );
+  // get all thoughts
+
+  getThought(req, res) {
+    Thought.find({})
+      .populate({
+        path: "reactions",
+        select: "-__v",
       })
-      .then((dbSocialNetwork) => {
-        if (!dbSocialNetwork) {
-          res.status(404).json({ message: "No users found with this id!" });
+      .select("-__v")
+      .sort({ _id: -1 })
+      .then((dbThoughts) => res.json(dbThoughts))
+      .catch((err) => {
+        console.log(err);
+        res.status(400).json(err);
+      });
+  },
+
+  // get one thought by Id
+  getThoughtById({ params }, res) {
+    Thought.findOne({ _id: params.thoughtId })
+      .populate({
+        path: "reactions",
+        select: "-__v",
+      })
+      .select("-__v")
+      .then((dbThoughts) => {
+        if (!dbThoughts) {
+          res.status(404).json({ message: "No thoughts found with this id!" });
           return;
         }
-        res.json(dbSocialNetwork);
+        res.json(dbThoughts);
       })
-      .catch((err) => res.json(err));
+      .catch((err) => {
+        console.log(err);
+        res.status(400).json(err);
+      });
+  },
+
+  // add thought
+  addThought({ params, body }, res) {
+    console.log("body", body);
+    Thought.create(body)
+      .then((thoughtInfo) => {
+        console.log("info!", thoughtInfo);
+        Users.findOneAndUpdate(
+          { _id: params.userId },
+          { $push: { thoughts: thoughtInfo._id } },
+          { new: true }
+        ).then((dbThoughts) => {
+          console.log("asdf");
+          if (!dbThoughts) {
+            res.status(404).json({ message: "No users found with this id!" });
+            return;
+          }
+          res.json(dbThoughts);
+        });
+      })
+      .catch((err) => {
+        console.log("err: ", err);
+        return res.json(err);
+      });
   },
 
   //   add a reaction to a thought
   addReaction({ params, body }, res) {
     Thought.findOneAndUpdate(
-      { _id: params.reactionId },
+      { _id: params.thoughtId },
       { $push: { reactions: body } },
       { new: true, runValidators: true }
     )
-      .then((dbSocialNetwork) => {
-        if (!dbSocialNetwork) {
+      .then((dbThoughts) => {
+        console.log("yoooooo", params.userId);
+        if (!dbThoughts) {
           res.status(404).json({ message: "No thoughts found with this id!" });
           return;
         }
-        res.json(dbSocialNetwork);
+        res.json(dbThoughts);
       })
       .catch((err) => res.json(err));
   },
@@ -46,12 +89,12 @@ const thoughtController = {
       { new: true }
     )
 
-      .then((dbSocialNetwork) => {
-        if (!dbSocialNetwork) {
+      .then((dbThoughts) => {
+        if (!dbThoughts) {
           res.status(404).json({ message: "No users found with this id!" });
           return;
         }
-        res.json(dbSocialNetwork);
+        res.json(dbThoughts);
       })
       .catch((err) => res.json(err));
   },
@@ -68,12 +111,12 @@ const thoughtController = {
           { new: true }
         );
       })
-      .then((dbSocialNetwork) => {
-        if (!dbSocialNetwork) {
+      .then((dbThoughts) => {
+        if (!dbThoughts) {
           res.status(404).json({ message: "No users found with this id!" });
           return;
         }
-        res.json(dbSocialNetwork);
+        res.json(dbThoughts);
       })
       .catch((err) => res.json(err));
   },

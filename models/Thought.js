@@ -14,7 +14,6 @@ const reactionSchema = new Schema(
     },
     userName: {
       type: String,
-      unique: true,
       required: true,
       trim: true,
     },
@@ -47,7 +46,6 @@ const ThoughtSchema = new Schema(
     },
     userName: {
       type: String,
-      unique: true,
       required: true,
       trim: true,
     },
