@@ -2,7 +2,6 @@ const { Thought, Users } = require("../models");
 
 const thoughtController = {
   // get all thoughts
-
   getThought(req, res) {
     Thought.find({})
       .populate({
@@ -82,43 +81,41 @@ const thoughtController = {
       .catch((err) => res.json(err));
   },
   //   remove reaction from a specific thought
-  removeReaction({ params }, res) {
-    Thought.findOneAndUpdate(
-      { _id: params.thoughtId },
-      { $pull: { reactions: { reactionId: params.reactionId } } },
-      { new: true }
-    )
+  // removeReaction({ params }, res) {
+  //   Thought.findOneAndUpdate(
+  //     { _id: params.thoughtId },
+  //     { $pull: { reactions: { reactionId: params.reactionId } } },
+  //     { new: true }
+  //   )
 
-      .then((dbThoughts) => {
-        if (!dbThoughts) {
-          res.status(404).json({ message: "No users found with this id!" });
-          return;
-        }
-        res.json(dbThoughts);
-      })
-      .catch((err) => res.json(err));
-  },
+  //     .then((dbThoughts) => {
+  //       if (!dbThoughts) {
+  //         res.status(404).json({ message: "No users found with this id!" });
+  //         return;
+  //       }
+  //       res.json(dbThoughts);
+  //     })
+  //     .catch((err) => res.json(err));
+  // },
   //   remove thought
   removeThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.thoughtId })
-      .then((deletedThought) => {
-        if (!deletedThought) {
-          return res.status(404).json({ message: "No thoughts with this id!" });
-        }
-        return Users.findOneAndUpdate(
-          { _id: params.UserId },
-          { $pull: { thoughts: params.thoughtId } },
-          { new: true }
-        );
-      })
-      .then((dbThoughts) => {
-        if (!dbThoughts) {
-          res.status(404).json({ message: "No users found with this id!" });
-          return;
-        }
-        res.json(dbThoughts);
-      })
-      .catch((err) => res.json(err));
+    Thought.findOneAndDelete({
+      _id: params.thoughtId,
+    }).then((dbThoughtData) => {
+      console.log(dbThoughtData);
+      if (!dbThoughtData) {
+        res.status(404).json({ message: " WRONGGG" });
+      }
+      Users.findOneAndUpdate(
+        { thoughts: dbThoughtData._id },
+        { $pull: { thoughts: dbThoughtData._id } }
+      )
+        .then((data) => {
+          console.log(data);
+          res.json(dbThoughtData);
+        })
+        .catch((err) => res.status(400).json(err));
+    });
   },
 };
 

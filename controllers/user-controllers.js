@@ -4,12 +4,12 @@ const usersController = {
   // get all users
   getAllUsers(req, res) {
     Users.find({})
-      .populate({
-        path: "thoughts",
-        select: "-__v",
-      })
-      .select("-__v")
-      .sort({ _id: -1 })
+      // .populate({
+      //   path: "thoughts",
+      //   select: "-__v",
+      // })
+      // .select("-__v")
+      // .sort({ _id: -1 })
       .then((dbSocialNetwork) => res.json(dbSocialNetwork))
       .catch((err) => {
         console.log(err);
