@@ -80,23 +80,7 @@ const thoughtController = {
       })
       .catch((err) => res.json(err));
   },
-  //   remove reaction from a specific thought
-  // removeReaction({ params }, res) {
-  //   Thought.findOneAndUpdate(
-  //     { _id: params.thoughtId },
-  //     { $pull: { reactions: { reactionId: params.reactionId } } },
-  //     { new: true }
-  //   )
 
-  //     .then((dbThoughts) => {
-  //       if (!dbThoughts) {
-  //         res.status(404).json({ message: "No users found with this id!" });
-  //         return;
-  //       }
-  //       res.json(dbThoughts);
-  //     })
-  //     .catch((err) => res.json(err));
-  // },
   //   remove thought
   removeThought({ params }, res) {
     Thought.findOneAndDelete({
@@ -116,6 +100,23 @@ const thoughtController = {
         })
         .catch((err) => res.status(400).json(err));
     });
+  },
+  //   remove reaction from a specific thought
+  removeReaction({ params }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
+      { new: true }
+    )
+
+      .then((dbThoughts) => {
+        if (!dbThoughts) {
+          res.status(404).json({ message: "No users found with this id!" });
+          return;
+        }
+        res.json(dbThoughts);
+      })
+      .catch((err) => res.json(err));
   },
 };
 
