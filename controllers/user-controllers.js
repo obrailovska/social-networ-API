@@ -4,12 +4,6 @@ const usersController = {
   // get all users
   getAllUsers(req, res) {
     Users.find({})
-      // .populate({
-      //   path: "thoughts",
-      //   select: "-__v",
-      // })
-      // .select("-__v")
-      // .sort({ _id: -1 })
       .then((dbSocialNetwork) => res.json(dbSocialNetwork))
       .catch((err) => {
         console.log(err);
@@ -57,6 +51,25 @@ const usersController = {
       })
       .catch((err) => res.status(400).json(err));
   },
+
+  // add friend
+  addFriend({ params }, res) {
+    Users.findByIdAndUpdate(
+      { _id: params.id },
+      { $push: { friends: params.friendsId } },
+      { new: true }
+    )
+      .populate({ path: "friends", select: "-__v" })
+      .then((dbSocialNetwork) => {
+        if (!dbSocialNetwork) {
+          res.status(404).json({ message: "No friends with this id" });
+          return;
+        }
+        res.json(dbSocialNetwork);
+      })
+      .catch((err) => res.status(400).json(err));
+  },
+
   //   delete user
   deleteUser({ params }, res) {
     Users.findOneAndDelete({ _id: params.id })
