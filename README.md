@@ -19,3 +19,4 @@ Built by Olha Brailovska.
 ## Testing
 
 Walkthrough video:
+https://youtu.be/eWLiGz5VZcY
